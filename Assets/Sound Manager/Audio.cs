@@ -7,6 +7,5 @@ using UnityEngine;
 public class Audio
 {
     public AudioClip clip;
-    public SoundManager.Sound sound;
     public bool loop;
 }

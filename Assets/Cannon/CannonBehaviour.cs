@@ -9,6 +9,7 @@ public class CannonBehaviour : MonoBehaviour
     [SerializeField] private float rotateSpeed;
 
     private Vector3 _position;
+    private bool movingCannon = false;
 
     private void Start()
     {
@@ -17,14 +18,25 @@ public class CannonBehaviour : MonoBehaviour
 
     private void Update()
     {
+        movingCannon = false;
         if (Input.GetKey(KeyCode.DownArrow))
         {
             RotateCannon(-rotateSpeed);
+            movingCannon = true;
         }
-
         if (Input.GetKey(KeyCode.UpArrow))
         {
             RotateCannon(rotateSpeed);
+            movingCannon = true;
+        }
+
+        if (movingCannon)
+        {
+            SoundManager.Instance.StartSound(SoundManager.Sound.MachineMove);
+        }
+        else
+        {
+            SoundManager.Instance.StopSound(SoundManager.Sound.MachineMove);
         }
 
         transform.position = _position;

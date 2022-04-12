@@ -1,8 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Random = UnityEngine.Random;
 
 public class SoundManager : MonoBehaviour
 {
@@ -10,8 +9,9 @@ public class SoundManager : MonoBehaviour
     public static SoundManager Instance;
     
     [SerializeField]
-    private Audio[] audios;
-    private readonly Dictionary<Sound, List<AudioClip>> _audioClips = new Dictionary<Sound, List<AudioClip>>();
+    private AudioType[] audios;
+
+    private Dictionary<Sound, AudioSource> _playingSounds = new Dictionary<Sound, AudioSource>();
     
     public enum Sound
     {
@@ -22,6 +22,33 @@ public class SoundManager : MonoBehaviour
     {
     }
 
+    /// <summary>
+    /// Play a sound and loop it until StopSound(sound) is called.
+    /// If a sound that is already playing, is started, it will return.
+    /// </summary>
+    /// <param name="sound"></param>
+    public void StartSound(Sound sound)
+    {
+        if (_playingSounds.ContainsKey(sound)) return;
+        AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+        Audio audio = GetAudio(sound);
+        audioSource.clip = audio.clip;
+        audioSource.loop = audio.loop;
+        _playingSounds.Add(sound, audioSource);
+        audioSource.Play();
+    }
+
+    /// <summary>
+    /// Stops a sound from playing.
+    /// </summary>
+    /// <param name="sound"></param>
+    public void StopSound(Sound sound)
+    {
+        if (!_playingSounds.ContainsKey(sound)) return;
+        _playingSounds[sound].Stop();
+        Destroy(_playingSounds[sound]);
+        _playingSounds.Remove(sound);
+    }
 
     private void Awake()
     {
@@ -31,30 +58,18 @@ public class SoundManager : MonoBehaviour
         }
 
         Instance = this;
-        InitSounds();
     }
 
-    private void InitSounds()
+    private Audio GetAudio(Sound sound)
     {
-        foreach (Audio audio in audios)
+        foreach (AudioType audioType in audios)
         {
-            _audioClips.Add(audio.sound, );
-        } 
-    }
-
-    /// <summary>
-    /// Play a sound and loop it until StopSound(sound) is called.
-    /// </summary>
-    /// <param name="sound"></param>
-    public void StartSound(Sound sound)
-    {
-    }
-
-    /// <summary>
-    /// Stops a sound from playing.
-    /// </summary>
-    /// <param name="sound"></param>
-    public void StopSound(Sound sound)
-    {
+            if (audioType.sound == sound)
+            {
+                return audioType.audios[Random.Range(0, audioType.audios.Length)];
+            }
+        }
+        Debug.LogError($"Couldn't find sound ${sound}");
+        return null;
     }
 }
