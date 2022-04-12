@@ -18,16 +18,22 @@ public class CannonBehaviour : MonoBehaviour
 
     private void Update()
     {
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Shoot();
+        }
+    
         movingCannon = false;
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            RotateCannon(-rotateSpeed);
             movingCannon = true;
+            RotateCannon(-rotateSpeed);
         }
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            RotateCannon(rotateSpeed);
             movingCannon = true;
+            RotateCannon(rotateSpeed);
         }
 
         if (movingCannon)
@@ -42,6 +48,11 @@ public class CannonBehaviour : MonoBehaviour
         transform.position = _position;
     }
 
+    private void Shoot()
+    {
+        
+    }
+
     private void RotateCannon(float speed)
     {
         transform.RotateAround(
@@ -49,8 +60,11 @@ public class CannonBehaviour : MonoBehaviour
             Vector3.forward,
             30f * speed * Time.deltaTime
         );
+
         float angle = transform.eulerAngles.z;
-        transform.eulerAngles = new Vector3(0f, 0f, ClampAngle(angle, -72.0f,18.0f));
+        float clampedAngle = ClampAngle(angle, -72.0f,18.0f);
+        if(clampedAngle != angle) movingCannon = false;
+        transform.eulerAngles = new Vector3(0.0f, 0.0f, clampedAngle);
     }
     
      private float ClampAngle(float angle, float min, float max)
@@ -77,4 +91,5 @@ public class CannonBehaviour : MonoBehaviour
          }
          return angle;
      }
+
 }
