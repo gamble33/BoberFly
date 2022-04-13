@@ -26,35 +26,41 @@ public class CannonBehaviour : MonoBehaviour
     private void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Recoil();
-            _shootBehaviour.Shoot();
-            return;
-        }
-    
-        _movingCannon = false;
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            _movingCannon = true;
-            RotateCannon(-rotateSpeed);
-        }
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            _movingCannon = true;
-            RotateCannon(rotateSpeed);
-        }
+        
+        
+        if(GameManager.Instance.GetState() == GameManager.State.Aiming) {
 
-        if (_movingCannon)
-        {
-            SoundManager.Instance.StartSound(SoundManager.Sound.MachineMove);
-        }
-        else
-        {
-            SoundManager.Instance.StopSound(SoundManager.Sound.MachineMove);
-        }
-      
-        if(transform.position != _position) {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Recoil();
+                _shootBehaviour.Shoot();
+                GameManager.Instance.SetState(GameManager.State.Flying);
+                return;
+            }
+
+            _movingCannon = false;
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                _movingCannon = true;
+                RotateCannon(-rotateSpeed);
+            }
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                _movingCannon = true;
+                RotateCannon(rotateSpeed);
+            }
+
+            if (_movingCannon)
+            {
+                SoundManager.Instance.StartSound(SoundManager.Sound.MachineMove);
+            }
+            else
+            {
+                SoundManager.Instance.StopSound(SoundManager.Sound.MachineMove);
+            }
+          
+            transform.position = _position;
+        } else {
             transform.position = Vector3.Lerp(transform.position, _position, Time.deltaTime);
         }
         
