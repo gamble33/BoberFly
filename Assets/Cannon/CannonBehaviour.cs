@@ -8,6 +8,8 @@ public class CannonBehaviour : MonoBehaviour
 {
     [SerializeField] private Cannon cannon;
     [SerializeField] private float rotateSpeed;
+    [SerializeField] private float recoilSpeed;
+    [SerializeField]
 
     private Vector3 _position;
     private bool _movingCannon = false;
@@ -25,14 +27,17 @@ public class CannonBehaviour : MonoBehaviour
 
     private void Update()
     {
+        // TODO: Remove
+        if (Input.GetKeyDown(KeyCode.Space)) Recoil();
+        
+        // TODO: Remove
+        if (Input.GetKeyDown(KeyCode.R)) GameManager.Instance.SetState(GameManager.State.Aiming);
 
-        
-        
         if(GameManager.Instance.GetState() == GameManager.State.Aiming) {
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                Recoil();
+                // Recoil();
                 _shootBehaviour.Shoot();
                 GameManager.Instance.SetState(GameManager.State.Flying);
                 return;
@@ -61,7 +66,7 @@ public class CannonBehaviour : MonoBehaviour
           
             transform.position = _position;
         } else {
-            transform.position = Vector3.Lerp(transform.position, _position, Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, _position, Time.deltaTime * recoilSpeed);
         }
         
     }
@@ -106,7 +111,9 @@ public class CannonBehaviour : MonoBehaviour
      }
      
      private void Recoil() {
-        transform.position = new Vector3(transform.position.x - 0.25f, 0.0f, 0.0f);
+        // TODO: Fix recoil direction
+        Vector3 translation = (cannon.pivotTopRight.position - cannon.pivotBottomLeft.position) * -0.5f;
+        transform.Translate(translation);
      }
 
 }
