@@ -3,13 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(ShootBehaviour))]
 public class CannonBehaviour : MonoBehaviour
 {
-    [SerializeField] Cannon cannon;
+    [SerializeField] private Cannon cannon;
     [SerializeField] private float rotateSpeed;
 
     private Vector3 _position;
-    private bool movingCannon = false;
+    private bool _movingCannon = false;
+    private ShootBehaviour _shootBehaviour;
+    
+    private void Awake() {
+      _shootBehaviour = gameObject.GetComponent<ShootBehaviour>();
+      SoundManager.Instance.StartSound(SoundManager.Sound.AimingMusic);
+    }
 
     private void Start()
     {
@@ -21,22 +28,24 @@ public class CannonBehaviour : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Shoot();
+            Recoil();
+            _shootBehaviour.Shoot();
+            return;
         }
     
-        movingCannon = false;
+        _movingCannon = false;
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            movingCannon = true;
+            _movingCannon = true;
             RotateCannon(-rotateSpeed);
         }
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            movingCannon = true;
+            _movingCannon = true;
             RotateCannon(rotateSpeed);
         }
 
-        if (movingCannon)
+        if (_movingCannon)
         {
             SoundManager.Instance.StartSound(SoundManager.Sound.MachineMove);
         }
@@ -44,12 +53,10 @@ public class CannonBehaviour : MonoBehaviour
         {
             SoundManager.Instance.StopSound(SoundManager.Sound.MachineMove);
         }
-
-        transform.position = _position;
-    }
-
-    private void Shoot()
-    {
+      
+        if(transform.position != _position) {
+            transform.position = Vector3.Lerp(transform.position, _position, Time.deltaTime);
+        }
         
     }
 
@@ -63,7 +70,7 @@ public class CannonBehaviour : MonoBehaviour
 
         float angle = transform.eulerAngles.z;
         float clampedAngle = ClampAngle(angle, -72.0f,18.0f);
-        if(clampedAngle != angle) movingCannon = false;
+        if(clampedAngle != angle) _movingCannon = false;
         transform.eulerAngles = new Vector3(0.0f, 0.0f, clampedAngle);
     }
     
@@ -90,6 +97,10 @@ public class CannonBehaviour : MonoBehaviour
              angle += 360f;
          }
          return angle;
+     }
+     
+     private void Recoil() {
+        transform.position = new Vector3(transform.position.x - 0.25f, 0.0f, 0.0f);
      }
 
 }

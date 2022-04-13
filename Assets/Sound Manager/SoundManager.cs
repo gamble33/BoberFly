@@ -16,10 +16,7 @@ public class SoundManager : MonoBehaviour
     public enum Sound
     {
         MachineMove,
-    }
-
-    public enum Music
-    {
+        AimingMusic
     }
 
     /// <summary>
